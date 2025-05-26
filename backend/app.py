@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, send_file
 from flask_cors import CORS
 from blog_api import blog_bp
 from recipe_api import recipe_bp
@@ -11,10 +11,22 @@ CORS(app)  # Enable CORS for all routes
 app.register_blueprint(blog_bp)
 app.register_blueprint(recipe_bp)
 
+# Explicit route for recipes.html
+@app.route('/recipes.html')
+def recipes_page():
+    frontend_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend'))
+    file_path = os.path.join(frontend_dir, 'recipes.html')
+    print(f"Serving recipes.html from: {file_path}")
+    return send_file(file_path)
+
 # Serve frontend files
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_frontend(path):
+    # Skip if we're accessing recipes.html (handled by specific route)
+    if path == 'recipes.html':
+        return recipes_page()
+    
     # Print for debugging
     print(f"Requested path: {path}")
     
