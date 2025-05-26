@@ -15,10 +15,20 @@ app.register_blueprint(recipe_bp)
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_frontend(path):
-    if path and os.path.exists(os.path.join('../frontend', path)):
-        return send_from_directory('../frontend', path)
+    # Print for debugging
+    print(f"Requested path: {path}")
+    
+    # Check if the file exists in the frontend directory
+    frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend')
+    file_path = os.path.join(frontend_dir, path)
+    
+    if path and os.path.exists(file_path) and os.path.isfile(file_path):
+        # If the file exists, serve it directly
+        directory, filename = os.path.split(file_path)
+        return send_from_directory(directory, filename)
     else:
-        return send_from_directory('../frontend', 'index.html')
+        # Otherwise serve index.html
+        return send_from_directory(frontend_dir, 'index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
