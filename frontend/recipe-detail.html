@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recipe Detail</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Our Recipe Collection</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/recipes.html">All Recipes</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <article id="recipe-detail">
+            <!-- Dynamically populated -->
+        </article>
+        
+        <section class="comments">
+            <h2>Discussion</h2>
+            
+            <form id="comment-form">
+                <h3>Add Your Comment</h3>
+                <div class="form-group">
+                    <label for="author">Your Name:</label>
+                    <input type="text" id="author" name="author" required>
+                </div>
+                <div class="form-group">
+                    <label for="content">Comment:</label>
+                    <textarea id="content" name="content" rows="4" required></textarea>
+                </div>
+                <button type="submit">Post Comment</button>
+            </form>
+            
+            <div id="comments-container">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2023 Our Recipe Collection</p>
+    </footer>
+    
+    <script src="js/recipe-detail.js"></script>
+</body>
+</html>

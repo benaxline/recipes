@@ -1,100 +1,101 @@
 # CRUD: Create, Read, Update, Delete
 # For the blog aspect of the page
 
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
+from flask import Blueprint, request, jsonify
 from datetime import datetime
-import os
 
-# Init app
-app = Flask(__name__)
-basedir = os.path.abspath(os.path.dirname(__file__))
+blog_bp = Blueprint('blog_bp', __name__)
 
-# in memory database - for now
+# In-memory stores
 blogs = []
-next_id = 1
+comments = []
+next_blog_id = 1
+next_comment_id = 1
 
-# Create a Blog Post
-@app.route('/blog', methods=['POST'])
-def add_blog():
-    global next_id
-
-    data = request.json
-    title = request.json['title']
-    content = request.json['content']
-    author = request.json['author']
-    time_str = request.json['time']
-    time = datetime.fromisoformat(time_str)
-
-    new_blog = {
-        'id': next_id,
-        'title': title,
-        'content': content,
-        'author': author,
-        'time': time
-    }
-
-    blogs.append(new_blog)
-    next_id += 1
-
-    response = new_blog.copy()
-    response['time'] = time.isoformat()
-
-    return jsonify(response)
-
-# Get All Blog Posts
-@app.route('/blog', methods=['GET'])
+@blog_bp.route('/blogs', methods=['GET'])
 def get_blogs():
+    """Get all blog posts"""
     result = []
     for blog in blogs:
         blog_copy = blog.copy()
-        blog_copy['time'] = blog_copy['time'].isoformat()
+        blog_copy['time'] = blog['time'].isoformat()
         result.append(blog_copy)
-
+    
     return jsonify(result)
 
-# Get Single Blog Post
-@app.route('/blog/<int:id>', methods=['GET'])
-def get_blog(id):
+@blog_bp.route('/blogs/<int:blog_id>', methods=['GET'])
+def get_blog(blog_id):
+    """Get a specific blog post with its comments"""
     for blog in blogs:
-        if blog['id'] == id:
-            blog_copy = blog.copy()
-            blog_copy['time'] = blog_copy['time'].isoformat()
-            return jsonify(blog_copy)
-
-    return jsonify({'message': 'Blog post not found'})
-
-# Update a Blog Post
-@app.route('/blog/<int:id>', methods=['PUT'])
-def update_blog(id):
-    for blog in blogs:
-        if blog['id'] == id:
-            data = request.json
-            blog['title'] = data['title']
-            blog['content'] = data['content']
-            blog['author'] = data['author']
-            blog['time'] = datetime.fromisoformat(data['time'])
-
-            blog_copy = blog.copy()
-            blog_copy['time'] = blog_copy['time'].isoformat()
-            return jsonify(blog_copy)
-        
-        return jsonify({'message': 'Blog post not found'})
-
-
-# Delete Blog Post
-@app.route('/blog/<int:id>', methods=['DELETE'])
-def delete_blog(id):
-    for i, blog in enumerate(blogs):
-        if blog['id'] == id:
-            deleted_blog = blogs.pop(i)
-            response = deleted_blog.copy()
-            response['time'] = response['time'].isoformat()
+        if blog['id'] == blog_id:
+            # Get comments for this blog
+            blog_comments = [c for c in comments if c['blog_id'] == blog_id]
+            
+            # Format for JSON response
+            response = blog.copy()
+            response['time'] = blog['time'].isoformat()
+            
+            # Format comments
+            formatted_comments = []
+            for comment in blog_comments:
+                comment_copy = comment.copy()
+                comment_copy['time'] = comment['time'].isoformat()
+                formatted_comments.append(comment_copy)
+                
+            response['comments'] = formatted_comments
             return jsonify(response)
+    
+    return jsonify({'message': 'Blog not found'}), 404
 
-    return jsonify({'message': 'Blog post not found'})
+@blog_bp.route('/blogs', methods=['POST'])
+def add_blog():
+    """Create a new blog post"""
+    global next_blog_id
+    
+    data = request.json
+    new_blog = {
+        'id': next_blog_id,
+        'title': data['title'],
+        'content': data['content'],
+        'author': data['author'],
+        'recipe_title': data.get('recipe_title', ''),  # Optional link to recipe
+        'time': datetime.now()
+    }
+    
+    blogs.append(new_blog)
+    next_blog_id += 1
+    
+    # Format for JSON response
+    response = new_blog.copy()
+    response['time'] = new_blog['time'].isoformat()
+    
+    return jsonify(response), 201
 
-# Run Server
-if __name__ == '__main__':
-    app.run(debug=True)
+@blog_bp.route('/blogs/<int:blog_id>/comments', methods=['POST'])
+def add_comment(blog_id):
+    """Add a comment to a blog post"""
+    global next_comment_id
+    
+    # Check if blog exists
+    blog_exists = any(blog['id'] == blog_id for blog in blogs)
+    if not blog_exists:
+        return jsonify({'message': 'Blog not found'}), 404
+    
+    data = request.json
+    new_comment = {
+        'id': next_comment_id,
+        'blog_id': blog_id,
+        'content': data['content'],
+        'author': data['author'],
+        'parent_id': data.get('parent_id'),  # For replies to comments
+        'time': datetime.now()
+    }
+    
+    comments.append(new_comment)
+    next_comment_id += 1
+    
+    # Format for JSON response
+    response = new_comment.copy()
+    response['time'] = new_comment['time'].isoformat()
+    
+    return jsonify(response), 201
