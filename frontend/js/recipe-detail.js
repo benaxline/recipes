@@ -8,23 +8,22 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    // Fetch recipe details
-    fetch(`/recipes/${encodeURIComponent(recipeTitle)}`)
-        .then(response => response.json())
+    // Fetch recipe details from the API endpoint
+    fetch(`/api/recipes/${encodeURIComponent(recipeTitle)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(recipe => {
             displayRecipe(recipe);
-            fetchComments(recipe.title);
         })
         .catch(error => {
             console.error('Error fetching recipe:', error);
-            document.getElementById('recipe-detail').innerHTML = '<p>Error loading recipe</p>';
+            document.getElementById('recipe-detail').innerHTML = 
+                `<p>Error loading recipe: ${error.message}</p>`;
         });
-    
-    // Set up comment form
-    document.getElementById('comment-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        postComment(recipeTitle);
-    });
 });
 
 function displayRecipe(recipe) {

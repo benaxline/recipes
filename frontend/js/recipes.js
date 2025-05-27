@@ -1,21 +1,31 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Fetch all recipes
-    fetch('/recipes')
-        .then(response => response.json())
+    console.log('Recipes page loaded, fetching recipes...');
+    
+    // Fetch all recipes from the API endpoint
+    fetch('/api/recipes')
+        .then(response => {
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(recipes => {
+            console.log('Recipes received:', recipes);
             displayRecipes(recipes);
         })
         .catch(error => {
             console.error('Error fetching recipes:', error);
             document.getElementById('recipes-container').innerHTML = 
-                '<p>Error loading recipes. Please try again later.</p>';
+                `<p>Error loading recipes: ${error.message}. Please try again later.</p>`;
         });
 });
 
 function displayRecipes(recipes) {
     const recipesContainer = document.getElementById('recipes-container');
     
-    if (recipes.length === 0) {
+    if (!recipes || recipes.length === 0) {
         recipesContainer.innerHTML = '<p>No recipes found.</p>';
         return;
     }

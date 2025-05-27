@@ -1,46 +1,67 @@
-from flask import Flask, send_from_directory, send_file
-from flask_cors import CORS
-from blog_api import blog_bp
-from recipe_api import recipe_bp
+# backend/app.py
+
 import os
+import sys
+import traceback
+from flask import Flask, jsonify, send_from_directory
+from flask_cors import CORS
 
-app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+# make sure backend/ is on the path so we can import sheets.py
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, PROJECT_ROOT)
 
-# Register blueprints
-app.register_blueprint(blog_bp)
-app.register_blueprint(recipe_bp)
+from utils.sheets import get_recipes   # your helper
 
-# Explicit route for recipes.html
-@app.route('/recipes.html')
-def recipes_page():
-    frontend_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend'))
-    file_path = os.path.join(frontend_dir, 'recipes.html')
-    print(f"Serving recipes.html from: {file_path}")
-    return send_file(file_path)
+# Configure Flask to serve the frontend directory
+FRONTEND_DIR = os.path.join(PROJECT_ROOT, 'frontend')
+app = Flask(__name__,
+            static_folder=FRONTEND_DIR,
+            static_url_path='')  # serve at /
 
-# Serve frontend files
-@app.route('/', defaults={'path': ''})
+CORS(app)  # allow cross-origin; optional if you serve everything from this origin
+
+@app.route('/', defaults={'path': 'index.html'})
 @app.route('/<path:path>')
 def serve_frontend(path):
-    # Skip if we're accessing recipes.html (handled by specific route)
-    if path == 'recipes.html':
-        return recipes_page()
-    
-    # Print for debugging
-    print(f"Requested path: {path}")
-    
-    # Check if the file exists in the frontend directory
-    frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend')
-    file_path = os.path.join(frontend_dir, path)
-    
-    if path and os.path.exists(file_path) and os.path.isfile(file_path):
-        # If the file exists, serve it directly
-        directory, filename = os.path.split(file_path)
-        return send_from_directory(directory, filename)
-    else:
-        # Otherwise serve index.html
-        return send_from_directory(frontend_dir, 'index.html')
+    full_path = os.path.join(FRONTEND_DIR, path)
+    if os.path.isfile(full_path):
+        return send_from_directory(FRONTEND_DIR, path)
+    # if not a frontend file, return 404 so Flask can try other routes
+    return jsonify({'error': 'Not found'}), 404
+
+# @app.route('/')
+# def serve_index():
+#     # default to recipes.html as the home page
+#     return send_from_directory(FRONTEND_DIR, 'recipes.html')
+
+# @app.route('/recipes.html')
+# def serve_recipes_html():
+#     return send_from_directory(FRONTEND_DIR, 'recipes.html')
+
+# @app.route('/recipe-detail.html')
+# def serve_detail_html():
+#     return send_from_directory(FRONTEND_DIR,'recipe-detail.html')
+
+@app.route('/api/recipes', methods=['GET'])
+def api_list_recipes():
+    try:
+        recipes = get_recipes()
+        return jsonify(recipes), 200
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/recipes/<string:name>', methods=['GET'])
+def api_get_recipe(name):
+    try:
+        recipes = get_recipes()
+        for r in recipes:
+            if r.get('name', '').lower() == name.lower():
+                return jsonify(r), 200
+        return jsonify({'error': f'Recipe "{name}" not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # enable debug and auto-reload on changes
+    app.run(host='0.0.0.0', port=5005, debug=True)
