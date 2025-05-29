@@ -5,12 +5,12 @@ import sys
 import traceback
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from utils.sheets import get_recipes   # your helper
 
 # make sure backend/ is on the path so we can import sheets.py
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, PROJECT_ROOT)
-
-from utils.sheets import get_recipes   # your helper
 
 # Configure Flask to serve the frontend directory
 FRONTEND_DIR = os.path.join(PROJECT_ROOT, 'frontend')
@@ -19,6 +19,14 @@ app = Flask(__name__,
             static_url_path='')  # serve at /
 
 CORS(app)  # allow cross-origin; optional if you serve everything from this origin
+
+# database
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    'DATABASE_URL',
+    'sqlite:///' + os.path.join(PROJECT_ROOT, 'recipes.db')
+)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
 @app.route('/', defaults={'path': 'index.html'})
 @app.route('/<path:path>')
