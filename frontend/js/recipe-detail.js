@@ -29,9 +29,18 @@ document.addEventListener('DOMContentLoaded', function() {
 function displayRecipe(recipe) {
     const recipeDetail = document.getElementById('recipe-detail');
     
+    let titleText;
+    if (recipe.author) {
+        const author = recipe.author.trim()
+        const possessive = author.endsWith('s') ? author + "'" : author + "'s";
+        titleText = `${possessive} ${recipe.name}`;
+    } else {
+        // no author
+        titleText = recipe.name;
+    }
+
     const html = `
-        <h2>${recipe.name}</h2>
-        <p class="author">By ${recipe.author}</p>
+        <h2>${titleText}</h2>
         <p class="category">${recipe.type}</p>
         
         <h3>Ingredients</h3>
