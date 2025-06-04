@@ -91,8 +91,8 @@ def api_get_recipe(name):
         if not data:
             return jsonify({'error': f'Recipe \"{name}\" not found'}), 404
         recipe = data[0]
-        r['ingredients'] = recipe.get('ingredients', '').split('\n') if recipe.get('ingredients') else []
-        r['instructions'] = recipe.get('instructions', '').split('\n') if recipe.get('instructions') else []
+        recipe['ingredients'] = recipe.get('ingredients', '').split('\n') if recipe.get('ingredients') else []
+        recipe['instructions'] = recipe.get('instructions', '').split('\n') if recipe.get('instructions') else []
         return jsonify(recipe), 200
 
 
@@ -161,7 +161,7 @@ def api_update_recipe(id):
         dict: The updated recipe.
     """
     data = request.get_json() or {}
-    if not data.get('name') or not data.get('ingedients') or not data.get('instructions'):
+    if not data.get('name') or not data.get('ingredients') or not data.get('instructions'):
         return jsonify({'error':'name, ingredients, and instructions are required'}), 400
     try:
         getr = supabase.from_('Recipes').select('*').eq('id', id).limit(1).execute()
