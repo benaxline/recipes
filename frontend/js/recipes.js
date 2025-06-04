@@ -37,7 +37,7 @@ function displayRecipes(recipes) {
             <div class="recipe-card">
                 <h3>${recipe.name}</h3>
                 <p class="author">By ${recipe.author}</p>
-                <p class="category">${recipe.type}</p>
+                <p class="category">${recipe.category}</p>
                 <a href="/recipe-detail.html?title=${encodeURIComponent(recipe.name)}" 
                    class="view-recipe">View Recipe</a>
             </div>
