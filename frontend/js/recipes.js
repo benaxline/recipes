@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Recipes page loaded, fetching recipes...');
     
     // Fetch all recipes from the API endpoint
-    fetch('/api/recipes')
+    fetch('/.netlify/functions/get-recipes')
         .then(response => {
             console.log('Response status:', response.status);
             

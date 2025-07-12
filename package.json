@@ -1,0 +1,7 @@
+{
+    "name" : "recipe-backend",
+    "version" : "1.0.0",
+    "dependencies": {
+        "@supabase/supabase": "^2.36.0"
+    }
+}

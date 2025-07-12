@@ -176,3 +176,5 @@ cython_debug/
 
 # Google API
 credentials.json
+# Local Netlify folder
+.netlify

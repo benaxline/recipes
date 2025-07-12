@@ -1,0 +1,7 @@
+[build]
+    functions = "backend/netlify/functions"
+    publish = "frontend"
+
+[dev]
+    port = 8888
+    functions = "backend/netlify/functions"

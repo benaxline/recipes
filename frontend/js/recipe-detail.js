@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Fetch recipe details from the API endpoint
-    fetch(`/api/recipes/${encodeURIComponent(recipeTitle)}`)
+    fetch(`/.netlify/functions/get-recipe?name=${encodeURIComponent(recipeTitle)}`)
+    // fetch(`/api/recipes/${encodeURIComponent(recipeTitle)}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
