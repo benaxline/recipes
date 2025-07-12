@@ -11,14 +11,13 @@ exports.handler = async function(event) {
   }
 
   try {
-    // Confirm existence
-    const { data: existing, error: getErr } = await supabase
+    const { data: existing, error: fetchErr } = await supabase
       .from('Recipes')
       .select('id')
       .eq('id', id)
       .limit(1);
 
-    if (getErr) throw getErr;
+    if (fetchErr) throw fetchErr;
     if (!existing.length) return { statusCode: 404, body: JSON.stringify({ error: 'Not found' }) };
 
     await supabase.from('Recipes').delete().eq('id', id);

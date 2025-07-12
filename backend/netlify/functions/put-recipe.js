@@ -21,18 +21,16 @@ exports.handler = async function(event) {
   }
 
   try {
-    // Confirm recipe exists
-    const { data: existing, error: getErr } = await supabase
+    const { data: existing, error: fetchErr } = await supabase
       .from('Recipes')
-      .select('*')
+      .select('id')
       .eq('id', id)
       .limit(1);
 
-    if (getErr) throw getErr;
+    if (fetchErr) throw fetchErr;
     if (!existing.length) return { statusCode: 404, body: JSON.stringify({ error: 'Not found' }) };
 
-    // Check for conflicting name/author combo
-    const { data: dup, error: dupError } = await supabase
+    const { data: dup, error: dupErr } = await supabase
       .from('Recipes')
       .select('id')
       .eq('name', name)
@@ -40,7 +38,7 @@ exports.handler = async function(event) {
       .neq('id', id)
       .limit(1);
 
-    if (dupError) throw dupError;
+    if (dupErr) throw dupErr;
     if (dup.length > 0) {
       return { statusCode: 409, body: JSON.stringify({ error: 'Another recipe with that name exists' }) };
     }

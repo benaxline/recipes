@@ -16,15 +16,14 @@ exports.handler = async function(event) {
   }
 
   try {
-    // Check for duplicates
-    const { data: dup, error: dupError } = await supabase
+    const { data: dup, error: dupErr } = await supabase
       .from('Recipes')
       .select('id')
       .eq('name', name)
       .eq('author', author)
       .limit(1);
 
-    if (dupError) throw dupError;
+    if (dupErr) throw dupErr;
     if (dup.length > 0) {
       return { statusCode: 409, body: JSON.stringify({ error: 'Recipe already exists' }) };
     }
@@ -37,7 +36,7 @@ exports.handler = async function(event) {
       instructions: instructions.join('\n')
     };
 
-    const { data: newRecipe, error } = await supabase
+    const { data: inserted, error } = await supabase
       .from('Recipes')
       .insert(payload)
       .select()
@@ -45,13 +44,10 @@ exports.handler = async function(event) {
 
     if (error) throw error;
 
-    newRecipe.ingredients = newRecipe.ingredients?.split('\n') || [];
-    newRecipe.instructions = newRecipe.instructions?.split('\n') || [];
+    inserted.ingredients = inserted.ingredients?.split('\n') || [];
+    inserted.instructions = inserted.instructions?.split('\n') || [];
 
-    return {
-      statusCode: 201,
-      body: JSON.stringify(newRecipe)
-    };
+    return { statusCode: 201, body: JSON.stringify(inserted) };
   } catch (err) {
     return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }
