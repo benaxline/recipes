@@ -23,26 +23,29 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function displayRecipes(recipes) {
-    const recipesContainer = document.getElementById('recipes-container');
-    
-    if (!recipes || recipes.length === 0) {
-        recipesContainer.innerHTML = '<p>No recipes found.</p>';
-        return;
-    }
-    
-    let html = '';
-    
-    recipes.forEach(recipe => {
-        html += `
-            <div class="recipe-card">
-                <h3>${recipe.name}</h3>
-                <p class="author">By ${recipe.author}</p>
-                <p class="category">${recipe.category}</p>
-                <a href="/recipe-detail.html?title=${encodeURIComponent(recipe.name)}" 
-                   class="view-recipe">View Recipe</a>
-            </div>
-        `;
-    });
-    
-    recipesContainer.innerHTML = html;
+  const recipesContainer = document.getElementById('recipes-container');
+
+  if (!recipes || recipes.length === 0) {
+    recipesContainer.innerHTML = '<p class="text-muted text-center">No recipes found.</p>';
+    return;
+  }
+
+  let html = '';
+
+  recipes.forEach(recipe => {
+    html += `
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">${recipe.name}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">By ${recipe.author || 'Unknown'}</h6>
+            <p class="card-text"><span class="badge bg-secondary">${recipe.type || 'Uncategorized'}</span></p>
+            <a href="recipe-detail.html?title=${encodeURIComponent(recipe.name)}" class="btn btn-primary mt-auto">View Recipe</a>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  recipesContainer.innerHTML = html;
 }
