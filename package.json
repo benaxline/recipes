@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "dependencies": {
         "@supabase/supabase-js": "^2.50.5",
+        "bootstrap": "^5.3.7",
         "pg": "^8.16.3"
     }
 }
