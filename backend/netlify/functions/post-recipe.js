@@ -8,6 +8,12 @@ exports.handler = async function(event) {
   const data = JSON.parse(event.body || '{}');
   const { name, author, type, ingredients, instructions } = data;
 
+  if (secret !== process.env.RECIPE_API_SECRET) {
+    return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
+  }
+
+  // Validate required fields
+
   if (!name || !ingredients || !instructions) {
     return {
       statusCode: 400,
@@ -33,7 +39,8 @@ exports.handler = async function(event) {
       author,
       type,
       ingredients: ingredients.join('\n'),
-      instructions: instructions.join('\n')
+      instructions: instructions.join('\n'),
+      approved: true
     };
 
     const { data: inserted, error } = await supabase

@@ -11,7 +11,7 @@ document.getElementById('recipe-form').addEventListener('submit', function(event
         secret: document.getElementById('secret').value.trim()
     };
 
-    fetch('/api/recipes', { // '/.netlify/functions/submit-recipe', {
+    fetch('/.netlify/functions/post-recipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(recipe)
