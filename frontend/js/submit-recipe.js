@@ -8,7 +8,7 @@ document.getElementById('recipe-form').addEventListener('submit', function(event
         type: document.getElementById('type').value.trim(),
         ingredients: document.getElementById('ingredients').value.trim().split(',').map(i => i.trim()),
         instructions: document.getElementById('instructions').value.trim().split('\n').map(i => i.trim()),
-        approved: false
+        secret: document.getElementById('secret').value.trim()
     };
 
     fetch('/.netlify/functions/submit-recipe', {

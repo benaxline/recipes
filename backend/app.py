@@ -113,6 +113,13 @@ def api_create_recipe():
     """
    
     data = request.get_json() or {}
+
+    # Password Checkkkkkk
+    submitted_secret = data.pop('secret', None)
+    expected_secret = os.getenv('RECIPE_API_SECRET')
+    if submitted_secret != expected_secret:
+        return jsonify({'error': 'Unauthorized'}), 401
+
     if not data.get('name') or not data.get('ingredients') or not data.get('instructions'):
         return jsonify({'error': 'name, ingredients, and instructions are required'}), 400
     
