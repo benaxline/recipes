@@ -1,0 +1,51 @@
+<!-- submit-recipe.html -->
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Recipe</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>Submit Your Recipe</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="recipes.html">All Recipes</a></li>
+
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <form id="recipe-form">
+            <label for="name">Recipe Name:</label>
+            <input type="name" id="name" name="name" required><br>
+
+            <label for="author">Author Name:</label>
+            <input type="text" id="author" name="author" required><br>
+
+            <label for="type">Type (e.g. Dessert, Entree, Appetizer, ...):</label>
+            <input type="text" id="type" name="type" required><br>
+
+            <label for="ingredients">Ingredients (comma-separated):</label>
+            <textarea id="ingredients" name="ingredients" rows="10" required></textarea><br>
+
+            <label for="instructions">Instructions (one step per line):</label>
+            <textarea id="instructions" name="instructions" rows="10" required></textarea><br>
+
+            <button type="submit">Submit Recipe</button>
+        </form>
+
+        <div id="submission-message"></div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Our Recipe Collection</p>
+    </footer>
+
+    <script src="js/submit-recipe.js"></script>
+</body>
+</html>

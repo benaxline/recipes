@@ -84,6 +84,7 @@ def api_get_recipe(name):
             supabase
             .from_('Recipes')
             .select('*')
+            .eq('approved', True)   # Only get approved recipes
             .ilike('name', name)
             .execute()
         )
@@ -134,7 +135,8 @@ def api_create_recipe():
             'author': data.get('author'),
             'type': data.get('type'),
             'ingredients': '\n'.join(data['ingredients']),
-            'instructions': '\n'.join(data['instructions'])
+            'instructions': '\n'.join(data['instructions']),
+            'approved': False
         }
 
         insert_resp = supabase.from_('Recipes').insert(payload).execute()

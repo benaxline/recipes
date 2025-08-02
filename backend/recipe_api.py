@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from utils.sheets import get_recipes
 import traceback
+from utils.supabase import insert_recipe
 
 recipe_bp = Blueprint('recipe_bp', __name__)
 
@@ -34,3 +35,6 @@ def get_recipe(name):
         print(f"Blueprint: Error fetching recipe {name}: {str(e)}")
         print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
+
+
+        
