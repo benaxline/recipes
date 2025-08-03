@@ -6,7 +6,7 @@ exports.handler = async function (event) {
   }
 
   const data = JSON.parse(event.body || '{}');
-  const { name, author, type, ingredients, instructions, secret } = data;
+  const { name, author, category, ingredients, instructions, secret } = data;
 
   // 🔍 Log all incoming values
   console.log('📥 Incoming data:', data);
@@ -52,7 +52,7 @@ exports.handler = async function (event) {
     const payload = {
       name,
       author,
-      type,
+      category,
       ingredients: safeIngredients,
       instructions: safeInstructions,
       approved: true
