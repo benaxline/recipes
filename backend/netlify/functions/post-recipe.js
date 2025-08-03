@@ -1,6 +1,6 @@
 const supabase = require('./helpers/supabase');
 
-exports.handler = async function(event) {
+exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -8,13 +8,21 @@ exports.handler = async function(event) {
   const data = JSON.parse(event.body || '{}');
   const { name, author, type, ingredients, instructions, secret } = data;
 
+  // 🔍 Log all incoming values
+  console.log('📥 Incoming data:', data);
+  console.log('🔐 Submitted secret:', secret);
+  console.log('🔐 Expected secret:', process.env.RECIPE_API_SECRET);
+
   if (secret !== process.env.RECIPE_API_SECRET) {
-    return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
+    console.log('⛔ Unauthorized attempt');
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: 'Unauthorized' })
+    };
   }
 
-  // Validate required fields
-
   if (!name || !ingredients || !instructions) {
+    console.log('⚠️ Missing required fields');
     return {
       statusCode: 400,
       body: JSON.stringify({ error: 'name, ingredients, and instructions are required' })
@@ -30,18 +38,27 @@ exports.handler = async function(event) {
       .limit(1);
 
     if (dupErr) throw dupErr;
-    if (dup.length > 0) {
-      return { statusCode: 409, body: JSON.stringify({ error: 'Recipe already exists' }) };
+    if (dup && dup.length > 0) {
+      console.log('⚠️ Duplicate recipe found');
+      return {
+        statusCode: 409,
+        body: JSON.stringify({ error: 'Recipe already exists' })
+      };
     }
+
+    const safeIngredients = Array.isArray(ingredients) ? ingredients.join('\n') : '';
+    const safeInstructions = Array.isArray(instructions) ? instructions.join('\n') : '';
 
     const payload = {
       name,
       author,
       type,
-      ingredients: ingredients.join('\n'),
-      instructions: instructions.join('\n'),
+      ingredients: safeIngredients,
+      instructions: safeInstructions,
       approved: true
     };
+
+    console.log('📦 Payload to insert:', payload);
 
     const { data: inserted, error } = await supabase
       .from('Recipes')
@@ -54,8 +71,16 @@ exports.handler = async function(event) {
     inserted.ingredients = inserted.ingredients?.split('\n') || [];
     inserted.instructions = inserted.instructions?.split('\n') || [];
 
-    return { statusCode: 201, body: JSON.stringify(inserted) };
+    console.log('✅ Recipe inserted successfully');
+    return {
+      statusCode: 201,
+      body: JSON.stringify(inserted)
+    };
   } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+    console.error('🔥 Server error:', err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message || 'Internal Server Error' })
+    };
   }
 };
