@@ -6,7 +6,7 @@ exports.handler = async function(event) {
   }
 
   const data = JSON.parse(event.body || '{}');
-  const { name, author, type, ingredients, instructions } = data;
+  const { name, author, type, ingredients, instructions, secret } = data;
 
   if (secret !== process.env.RECIPE_API_SECRET) {
     return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
