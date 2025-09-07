@@ -1,49 +1,45 @@
 // js/main.js
 
-document.addEventListener('DOMContentLoaded', initFeaturedSection);
-
-async function initFeaturedSection() {
+document.addEventListener('DOMContentLoaded', async () => {
   const grid = document.getElementById('featured-container');
   if (!grid) return;
 
   try {
-    const recipes = await fetchRecipes();
+    const recipes = await fetchAllRecipes();
 
-    // Prefer items explicitly marked featured; otherwise use all
-    const featuredSubset = (recipes || []).filter(r =>
+    if (!Array.isArray(recipes) || recipes.length === 0) {
+      grid.innerHTML = '<p>No recipes found.</p>';
+      return;
+    }
+
+    // If you ever add a "featured" flag, prefer those; otherwise use all
+    const featured = recipes.filter(r =>
       r?.featured === true ||
       r?.isFeatured === true ||
       (Array.isArray(r?.tags) && r.tags.includes('featured'))
     );
 
-    const pool = featuredSubset.length ? featuredSubset : recipes;
-
-    // Randomize and take 6
-    const pick = shuffle(pool).slice(0, 6);
+    const pool = featured.length ? featured : recipes;
+    const pick = shuffle(pool).slice(0, 6); // random 6
 
     grid.innerHTML = pick.map(cardHTML).join('');
   } catch (err) {
-    console.error('Failed to load featured recipes:', err);
-    const msg = err?.message || 'Unknown error';
-    document.getElementById('featured-container').innerHTML =
-      `<p>Error loading featured recipes: ${msg}</p>`;
+    console.error('Error loading featured recipes:', err);
+    grid.innerHTML = `<p>Error loading featured recipes: ${err?.message || 'Unknown error'}</p>`;
   }
-}
+});
 
-/** Fetch all recipes (adjust the endpoint if needed). */
-async function fetchRecipes() {
+/** Fetch all recipes (same endpoint used on All Recipes page). */
+async function fetchAllRecipes() {
   const res = await fetch('/api/recipes');
-  if (!res.ok) {
-    throw new Error(`HTTP error! Status: ${res.status}`);
-  }
-  // Expecting an array of recipe objects with at least: id, name
+  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
   return res.json();
 }
 
-/** Robust Fisher–Yates shuffle. Uses crypto if available. */
+/** Fisher–Yates shuffle (crypto-backed when available). */
 function shuffle(arr) {
   const a = arr.slice();
-  if (window.crypto && window.crypto.getRandomValues) {
+  if (window.crypto?.getRandomValues) {
     for (let i = a.length - 1; i > 0; i--) {
       const rand = new Uint32Array(1);
       window.crypto.getRandomValues(rand);
@@ -59,26 +55,22 @@ function shuffle(arr) {
   return a;
 }
 
-/** Build a simple card; link by ID so detail page reads ?id=... */
-function cardHTML(r) {
-  const id = r.id; // required per your note
-  const name = r.name || 'Untitled recipe';
-  const author = r.author ?? 'Unknown';
-  const type = r.type ?? '';
-  const img = r.image || r.cover || r.photo || 'https://picsum.photos/600/400?blur=1';
+/** Build a card that matches the All Recipes markup/styles. */
+function cardHTML(recipe) {
+  const name = recipe.name || 'Untitled';
+  const author = recipe.author ?? 'Unknown';
+  const type = recipe.type ?? '';
 
-  const href = `/recipe-detail.html?id=${encodeURIComponent(String(id))}`;
+  // Keep legacy title-based routing so your current recipe-detail page works.
+  // If you switch detail to use ID, change this to `?id=${recipe.id}`.
+  const href = `/recipe-detail.html?title=${encodeURIComponent(name)}`;
 
   return `
-    <a href="${href}" class="recipe-card">
-      <div class="recipe-card__image-wrap">
-        <img src="${img}" alt="${name}">
-      </div>
-      <div class="recipe-card__body">
-        <h3>${name}</h3>
-        <p class="author">By ${author}</p>
-        ${type ? `<p class="category">${type}</p>` : ''}
-      </div>
-    </a>
+    <div class="recipe-card">
+      <h3>${name}</h3>
+      <p class="author">By ${author}</p>
+      <p class="category">${type}</p>
+      <a href="${href}" class="view-recipe">View Recipe</a>
+    </div>
   `;
 }
