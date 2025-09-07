@@ -60,7 +60,7 @@ function displayRecipes(recipes) {
             <h5 class="card-title">${recipe.name}</h5>
             <h6 class="card-subtitle mb-2 text-muted">By ${recipe.author || 'Unknown'}</h6>
             <p class="card-text">
-              <span class="badge bg-secondary">${recipe.type || 'Uncategorized'}</span>
+              <span class="badge bg-secondary">${recipe.category || 'Uncategorized'}</span>
             </p>
             <a href="recipe-detail.html?title=${encodeURIComponent(recipe.name)}" class="btn btn-primary mt-auto">
               View Recipe
