@@ -20,7 +20,7 @@
   <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
       <div class="container">
-        <a class="navbar-brand fw-semibold" href="index.html">Home</a>
+        <a class="navbar-brand fs-3 m-0" href="index.html">Home</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -171,6 +171,47 @@
     integrity="sha384"
     crossorigin="anonymous"
   ></script>
+
+  <script>
+    (() => {
+      const path = location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.navbar-nav .nav-link').forEach(a => {
+        if (a.getAttribute('href') === path) {
+          a.classList.add('active', 'fw-semibold');
+        }
+      });
+    })();
+  </script>
+
+  <script>
+    (() => {
+      const normalize = (href) => {
+        try {
+          const u = new URL(href, location.origin);
+          // strip trailing slash
+          let p = u.pathname.replace(/\/+$/, '');
+          // map "" or "/" to "index"
+          if (p === '' || p === '/') return 'index';
+          // take last segment and strip .html/.htm
+          const last = p.split('/').pop();
+          return last.replace(/\.html?$/i, '');
+        } catch {
+          return '';
+        }
+      };
+
+      const current = normalize(location.pathname);
+
+      document.querySelectorAll('.navbar a.nav-link, .navbar a.navbar-brand').forEach(a => {
+        const target = normalize(a.getAttribute('href') || '');
+        const isActive = target && target === current;
+        a.classList.toggle('active', isActive);
+        a.classList.toggle('fw-bold', isActive);     // make it bold when active
+        if (isActive) a.setAttribute('aria-current', 'page');
+        else a.removeAttribute('aria-current');
+      });
+    })();
+    </script>
 
   <script src="js/submit-recipe.js"></script>
 </body>
