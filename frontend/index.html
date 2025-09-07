@@ -20,31 +20,39 @@
 </head>
 <body>
     <header>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-        <div class="container">
-          <!-- Big, bold 'Home' like in your screenshot -->
-          <a class="navbar-brand fw-bold fs-3 m-0" href="index.html">Home</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+      <div class="container">
+        <a class="navbar-brand fw-semibold" href="index.html">Home</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-          <button class="navbar-toggler" type="button"
-                  data-bs-toggle="collapse" data-bs-target="#siteNav"
-                  aria-controls="siteNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="recipes.html">View All Recipes</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="submit-recipe.html">Submit Recipe</a>
+            </li>
+          </ul>
 
-          <div class="collapse navbar-collapse" id="siteNav">
-            <ul class="navbar-nav ms-3 gap-4">
-              <li class="nav-item">
-                <a class="nav-link" href="recipes.html">View All Recipes</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="submit-recipe.html">Submit Recipe</a>
-              </li>
-            </ul>
-          </div>
+          <form class="d-flex" role="search" onsubmit="return false;">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+            <button class="btn btn-outline-success" type="button">Search</button>
+          </form>
         </div>
-      </nav>
-    </header>
-
+      </div>
+    </nav>
+  </header>
     
     <main>
         <section class="featured-recipes">
